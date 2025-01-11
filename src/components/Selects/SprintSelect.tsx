@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Select } from "antd";
-import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
+import { ISelectDataDTO } from "@/modules/dashboard/interfaces/select.interfaces";
 
 interface SprintSelectProps {
-  sprints: ISelectInterface[];
-  onChange: (value: ISelectInterface) => void;
+  sprints: ISelectDataDTO[];
+  onChange: (value: ISelectDataDTO) => void;
   onClick: () => void;
 }
 

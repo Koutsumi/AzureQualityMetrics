@@ -1,24 +1,29 @@
 import { useState } from "react";
+import { useToast } from "@/shared/contexts/toast.context";
 import Header from "./component";
 import {
   getProjects,
   getSprints,
 } from "@/modules/dashboard/actions/selects.actions";
-import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
+import { ISelectDataDTO } from "@/modules/dashboard/interfaces/select.interfaces";
 
 export const HeaderComponent: React.FC = () => {
-  const [selectedProjects, setSelectedProjects] = useState<ISelectInterface[]>(
+  const { toast } = useToast();
+  const [selectedProjects, setSelectedProjects] = useState<ISelectDataDTO[]>(
     []
   );
   const [selectProject, setSelectProject] = useState<string>("");
-  const [selectedSprints, setSelectedSprints] = useState<ISelectInterface[]>(
-    []
-  );
-  const [selecteSprint, setSelectSprint] = useState<ISelectInterface>();
+  const [selectedSprints, setSelectedSprints] = useState<ISelectDataDTO[]>([]);
+  const [selecteSprint, setSelectSprint] = useState<ISelectDataDTO>();
 
   const getProjectsData = async () => {
     const response = await getProjects();
-    setSelectedProjects(response);
+
+    if (response.error) {
+      return toast.error(response.error);
+    }
+
+    setSelectedProjects(response.data || []);
   };
 
   const onProjectChange = (value: string) => {
@@ -27,10 +32,15 @@ export const HeaderComponent: React.FC = () => {
 
   const getSprintsData = async (projectId: string) => {
     const response = await getSprints(projectId);
-    setSelectedSprints(response);
+
+    if (response.error) {
+      return toast.error(response.error);
+    }
+
+    setSelectedSprints(response.data || []);
   };
 
-  const onSprintChange = (value: ISelectInterface) => {
+  const onSprintChange = (value: ISelectDataDTO) => {
     setSelectSprint(value);
   };
 

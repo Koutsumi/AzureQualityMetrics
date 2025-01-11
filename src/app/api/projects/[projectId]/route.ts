@@ -22,9 +22,7 @@ export async function GET(
     const connection = getAzureDevOpsConnection(organizationUrl, token);
     const coreApi = await connection.getCoreApi();
 
-    console.log("Fetching project...");
     const project = await coreApi.getProject(projectId);
-    console.log("Project fetched successfully:", project);
 
     return NextResponse.json({ project }, { status: 200 });
   } catch (error: unknown) {

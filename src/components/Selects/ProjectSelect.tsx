@@ -1,10 +1,10 @@
 "use client";
 
-import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
+import { ISelectDataDTO } from "@/modules/dashboard/interfaces/select.interfaces";
 import { Select } from "antd";
 
 interface ProjectSelectProps {
-  projects: ISelectInterface[];
+  projects: ISelectDataDTO[];
   onChange: (value: string) => void;
   onClick: () => void;
 }
@@ -15,7 +15,7 @@ const ProjectSelect: React.FC<ProjectSelectProps> = ({
   onClick,
 }) => {
   const options = Array.isArray(projects)
-    ? projects.map((project: ISelectInterface) => ({
+    ? projects.map((project: ISelectDataDTO) => ({
         label: project.name,
         value: project.id,
       }))

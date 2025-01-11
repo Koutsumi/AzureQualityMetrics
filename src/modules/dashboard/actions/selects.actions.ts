@@ -1,14 +1,17 @@
 "use server";
 
 import { getAzureDevOpsConnection } from "@/app/api/utils/azureConnection";
-import { ISelectInterface } from "../interfaces/select.interfaces";
+import { IProjectResponse } from "../interfaces/select.interfaces";
+import { getErrorMessage } from "@/shared/utils/getErrorMessage";
 
 const organizationUrl = process.env.AZURE_DEVOPS_ORG_URL;
 const token = process.env.AZURE_DEVOPS_ACCESS_TOKEN;
 
-export const getProjects = async (): Promise<ISelectInterface[]> => {
+export const getProjects = async (): Promise<IProjectResponse> => {
   if (!organizationUrl || !token) {
-    throw new Error("Missing environment variables");
+    return {
+      error: "Variáveis incorretas",
+    };
   }
 
   try {
@@ -16,21 +19,26 @@ export const getProjects = async (): Promise<ISelectInterface[]> => {
     const coreApi = await client.getCoreApi();
     const projects = await coreApi.getProjects();
 
-    return projects.map((project) => ({
-      id: project.id || "",
-      name: project.name || "",
-    }));
+    return {
+      data: projects.map((project) => ({
+        id: project.id || "",
+        name: project.name || "",
+      })),
+    };
   } catch (error) {
-    console.error("Erro ao buscar projetos:", error);
-    throw new Error("Falha ao obter projetos");
+    return {
+      error: getErrorMessage(error, "Erro ao buscar projetos"),
+    };
   }
 };
 
 export const getSprints = async (
   projectId: string
-): Promise<ISelectInterface[]> => {
+): Promise<IProjectResponse> => {
   if (!organizationUrl || !token) {
-    throw new Error("Missing environment variables");
+    return {
+      error: "Variáveis de ambiente incorretas",
+    };
   }
 
   try {
@@ -39,21 +47,18 @@ export const getSprints = async (
 
     const teamContext = { projectId };
 
-    console.log("Fetching sprints for project:", teamContext);
-
     const iterations = await workApi.getTeamIterations(teamContext);
 
-    if (!iterations || !Array.isArray(iterations)) {
-      console.warn("No iterations found for project:", projectId);
-      return [];
-    }
-
-    return iterations.map((iteration) => ({
-      id: iteration.id || "",
-      name: iteration.name || "",
-    }));
+    return {
+      data: iterations.map((iteration) => ({
+        id: iteration.id || "",
+        name: iteration.name || "",
+      })),
+    };
   } catch (error) {
     console.error("Erro ao buscar sprints:", error);
-    throw new Error("Falha ao obter sprints");
+    return {
+      error: getErrorMessage(error, "Erro ao buscar sprints"),
+    };
   }
 };
