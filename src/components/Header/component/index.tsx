@@ -1,11 +1,11 @@
 import ProjectSelect from "@/components/Selects/ProjectSelect";
 import SprintSelect from "@/components/Selects/SprintSelect";
-import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
+import { ISelectDataDTO } from "@/modules/dashboard/interfaces/select.interfaces";
 interface HeaderProps {
-  projects: ISelectInterface[];
-  sprints: { id: string; name: string }[];
+  projects: ISelectDataDTO[];
+  sprints: ISelectDataDTO[];
   onProjectChange: (value: string) => void;
-  onSprintChange: (value: ISelectInterface) => void;
+  onSprintChange: (value: ISelectDataDTO) => void;
   onClickProjectSelect: () => void;
   onClickSprintSelect: () => void;
 }
