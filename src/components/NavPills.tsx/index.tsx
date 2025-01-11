@@ -1,3 +1,5 @@
+"use client";
+
 import { Tabs } from "antd";
 import { JSX } from "react";
 

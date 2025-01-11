@@ -1,7 +1,6 @@
 "use server";
 
 import { getAzureDevOpsConnection } from "@/app/api/utils/azureConnection";
-import { NextResponse } from "next/server";
 import { ISelectInterface } from "../interfaces/select.interfaces";
 
 const organizationUrl = process.env.AZURE_DEVOPS_ORG_URL;
@@ -27,23 +26,31 @@ export const getProjects = async (): Promise<ISelectInterface[]> => {
   }
 };
 
-export const getSprints = async (projectId: string) => {
+export const getSprints = async (
+  projectId: string
+): Promise<ISelectInterface[]> => {
   if (!organizationUrl || !token) {
-    return NextResponse.json(
-      { error: "Missing environment variables" },
-      { status: 500 }
-    );
+    throw new Error("Missing environment variables");
   }
 
   try {
     const client = getAzureDevOpsConnection(organizationUrl, token);
     const workApi = await client.getWorkApi();
+
     const teamContext = { projectId };
 
-    const iterations = await workApi.getTeamIterations(teamContext, "current");
+    console.log("Fetching sprints for project:", teamContext);
+
+    const iterations = await workApi.getTeamIterations(teamContext);
+
+    if (!iterations || !Array.isArray(iterations)) {
+      console.warn("No iterations found for project:", projectId);
+      return [];
+    }
+
     return iterations.map((iteration) => ({
-      id: iteration.id,
-      name: iteration.name,
+      id: iteration.id || "",
+      name: iteration.name || "",
     }));
   } catch (error) {
     console.error("Erro ao buscar sprints:", error);

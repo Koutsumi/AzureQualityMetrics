@@ -1,33 +1,12 @@
 "use client";
 
-import Header from "@/components/Header";
 import NavPills from "@/components/NavPills.tsx";
 import StatCard from "@/components/Cards/Start.Card";
 import BugsBySeverityChart from "@/components/Charts/BugsBySeverityChart";
-import { useEffect, useState } from "react";
 import { Bug, Check, CheckCircle, XCircle } from "lucide-react";
-
-import { getProjects } from "@/modules/dashboard/actions/selects.actions";
-import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
+import { HeaderComponent } from "@/components/Header/index";
 
 export const Dashboard = () => {
-  const [selectedProject, setSelectedProject] = useState<ISelectInterface[]>(
-    []
-  );
-  const [selectedSprint, setSelectedSprint] = useState<string | null>(null);
-
-  const getProjectsData = async () => {
-    const response = await getProjects();
-    console.log(response);
-    setSelectedProject(response);
-  };
-
-  const onProjectChange = (value: ISelectInterface[]) => {
-    setSelectedProject(value);
-  };
-
-  const onSprintChange = (value: string) => setSelectedSprint(value);
-
   const tabs = [
     {
       key: "overview",
@@ -71,13 +50,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      <Header
-        projects={selectedProject}
-        sprints={[]}
-        onProjectChange={onProjectChange}
-        onSprintChange={onSprintChange}
-        onClickProjectSelect={getProjectsData}
-      />
+      <HeaderComponent />
       <div className="px-6 py-4">
         <NavPills tabs={tabs} />
       </div>
