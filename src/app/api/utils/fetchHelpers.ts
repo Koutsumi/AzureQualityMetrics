@@ -1,32 +1,35 @@
-export async function fetchProjects(coreApi: any) {
-  return await coreApi.getProjects();
-}
+import type { WorkItemTrackingApi } from "azure-devops-node-api/WorkItemTrackingApi";
+import type {
+  WorkItemQueryResult,
+  WorkItemReference,
+  WorkItem,
+} from "azure-devops-node-api/interfaces/WorkItemTrackingInterfaces";
 
 export async function fetchWorkItems(
-  workItemTrackingApi: any,
+  workItemTrackingApi: WorkItemTrackingApi,
   projectName: string
-) {
+): Promise<WorkItem[]> {
   const query = {
     query: `SELECT [System.Id], [System.Title], [System.State]
-              FROM WorkItems
-              WHERE [System.TeamProject] = '${projectName}'`,
+            FROM WorkItems
+            WHERE [System.TeamProject] = '${projectName}'`,
   };
-  const queryResult = await workItemTrackingApi.queryByWiql(query);
+
+  const queryResult: WorkItemQueryResult =
+    await workItemTrackingApi.queryByWiql(query);
+
+  if (!queryResult.workItems || queryResult.workItems.length === 0) {
+    return [];
+  }
 
   return await Promise.all(
-    queryResult.workItems.map(async (item: any) => {
-      return await workItemTrackingApi.getWorkItem(item.id);
-    })
-  );
-}
-
-export async function fetchPullRequests(gitApi: any) {
-  const repositories = await gitApi.getRepositories();
-
-  return await Promise.all(
-    repositories.map(async (repo: any) => {
-      const prs = await gitApi.getPullRequests(repo.id, { status: 1 }); // Status 1: Active
-      return { repository: repo.name, pullRequests: prs };
-    })
+    queryResult.workItems
+      .filter(
+        (item): item is WorkItemReference & { id: number } =>
+          item.id !== undefined
+      )
+      .map(async (item) => {
+        return await workItemTrackingApi.getWorkItem(item.id);
+      })
   );
 }

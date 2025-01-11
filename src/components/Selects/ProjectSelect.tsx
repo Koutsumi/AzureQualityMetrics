@@ -1,9 +1,11 @@
+"use client";
+
 import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
 import { Select } from "antd";
 
 interface ProjectSelectProps {
   projects: ISelectInterface[];
-  onChange: (value: ISelectInterface[]) => void;
+  onChange: (value: string) => void;
   onClick: () => void;
 }
 

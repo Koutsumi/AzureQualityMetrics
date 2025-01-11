@@ -4,8 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "dev": "cross-env PORT=4000 next dev",
-    "start": "cross-env PORT=4000 next start",
+    "dev": "cross-env NEXT_DEBUG=1 PORT=4000 next dev",
+    "start": "cross-env NEXT_DEBUG=1 PORT=4000 next start",
     "build": "next build",
     "lint": "next lint"
   },

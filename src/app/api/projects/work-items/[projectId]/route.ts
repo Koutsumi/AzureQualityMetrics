@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { getAzureDevOpsConnection } from "../../../utils/azureConnection";
 import { fetchWorkItems } from "../../../utils/fetchHelpers";
+import type { NextRequest } from "next/server";
+import type { WorkItemTrackingApi } from "azure-devops-node-api/WorkItemTrackingApi";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { projectId: string } }
-) {
+): Promise<Response> {
   const { projectId } = params;
   const organizationUrl = process.env.AZURE_DEVOPS_ORG_URL;
   const token = process.env.AZURE_DEVOPS_ACCESS_TOKEN;
@@ -19,14 +21,14 @@ export async function GET(
 
   try {
     const connection = getAzureDevOpsConnection(organizationUrl, token);
-    const workItemTrackingApi = await connection.getWorkItemTrackingApi();
+    const workItemTrackingApi: WorkItemTrackingApi =
+      await connection.getWorkItemTrackingApi();
 
     const workItems = await fetchWorkItems(workItemTrackingApi, projectId);
     return NextResponse.json({ workItems }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Work items not found" },
-      { status: 404 }
-    );
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Work items not found";
+    return NextResponse.json({ error: errorMessage }, { status: 404 });
   }
 }

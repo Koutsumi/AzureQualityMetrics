@@ -1,3 +1,5 @@
+"use server";
+
 import { NextResponse } from "next/server";
 import { getAzureDevOpsConnection } from "../../utils/azureConnection";
 
@@ -25,12 +27,9 @@ export async function GET(
     console.log("Project fetched successfully:", project);
 
     return NextResponse.json({ project }, { status: 200 });
-  } catch (error: any) {
-    console.error("Error fetching project:", error);
-
-    return NextResponse.json(
-      { error: error.message || "Project not found" },
-      { status: 404 }
-    );
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Pull requests not found";
+    return NextResponse.json({ error: errorMessage }, { status: 404 });
   }
 }

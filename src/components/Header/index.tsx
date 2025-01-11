@@ -1,32 +1,47 @@
-import ProjectSelect from "@/components/Selects/ProjectSelect";
-import SprintSelect from "@/components/Selects/SprintSelect";
+import { useState } from "react";
+import Header from "./component";
+import {
+  getProjects,
+  getSprints,
+} from "@/modules/dashboard/actions/selects.actions";
 import { ISelectInterface } from "@/modules/dashboard/interfaces/select.interfaces";
-interface HeaderProps {
-  projects: ISelectInterface[];
-  sprints: { id: string; name: string }[];
-  onProjectChange: (value: ISelectInterface[]) => void;
-  onSprintChange: (value: string) => void;
-  onClickProjectSelect: () => void;
-}
 
-const Header: React.FC<HeaderProps> = ({
-  projects,
-  sprints,
-  onProjectChange,
-  onSprintChange,
-  onClickProjectSelect,
-}) => (
-  <div className="flex justify-between items-center py-4 px-6">
-    <h1 className="text-4xl font-bold">Dashboard</h1>
-    <div className="flex space-x-4">
-      <ProjectSelect
-        projects={projects}
-        onChange={onProjectChange}
-        onClick={onClickProjectSelect}
-      />
-      <SprintSelect sprints={sprints} onChange={onSprintChange} />
-    </div>
-  </div>
-);
+export const HeaderComponent: React.FC = () => {
+  const [selectedProjects, setSelectedProjects] = useState<ISelectInterface[]>(
+    []
+  );
+  const [selectProject, setSelectProject] = useState<string>("");
+  const [selectedSprints, setSelectedSprints] = useState<ISelectInterface[]>(
+    []
+  );
+  const [selecteSprint, setSelectSprint] = useState<ISelectInterface>();
 
-export default Header;
+  const getProjectsData = async () => {
+    const response = await getProjects();
+    setSelectedProjects(response);
+  };
+
+  const onProjectChange = (value: string) => {
+    setSelectProject(value);
+  };
+
+  const getSprintsData = async (projectId: string) => {
+    const response = await getSprints(projectId);
+    setSelectedSprints(response);
+  };
+
+  const onSprintChange = (value: ISelectInterface) => {
+    setSelectSprint(value);
+  };
+
+  return (
+    <Header
+      projects={selectedProjects}
+      sprints={selectedSprints}
+      onProjectChange={onProjectChange}
+      onSprintChange={onSprintChange}
+      onClickProjectSelect={getProjectsData}
+      onClickSprintSelect={() => getSprintsData(selectProject)}
+    />
+  );
+};
