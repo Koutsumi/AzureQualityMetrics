@@ -8,12 +8,14 @@ interface SprintSelectProps {
   sprints: ISelectDataDTO[];
   onChange: (value: ISelectDataDTO) => void;
   onClick: () => void;
+  value: ISelectDataDTO | undefined;
 }
 
 const SprintSelect: React.FC<SprintSelectProps> = ({
   sprints,
   onChange,
   onClick,
+  value,
 }) => {
   const sprintOptions = Array.isArray(sprints)
     ? sprints.map((sprint) => ({
@@ -29,6 +31,7 @@ const SprintSelect: React.FC<SprintSelectProps> = ({
       onChange={onChange}
       onClick={onClick}
       className="w-40"
+      value={value}
     />
   );
 };

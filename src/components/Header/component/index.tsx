@@ -8,6 +8,7 @@ interface HeaderProps {
   onSprintChange: (value: ISelectDataDTO) => void;
   onClickProjectSelect: () => void;
   onClickSprintSelect: () => void;
+  sprintValue: ISelectDataDTO | undefined;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -17,6 +18,7 @@ const Header: React.FC<HeaderProps> = ({
   onSprintChange,
   onClickProjectSelect,
   onClickSprintSelect,
+  sprintValue,
 }) => (
   <div className="flex justify-between items-center py-4 px-6">
     <h1 className="text-4xl font-bold">Dashboard</h1>
@@ -30,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({
         sprints={sprints}
         onChange={onSprintChange}
         onClick={onClickSprintSelect}
+        value={sprintValue}
       />
     </div>
   </div>
