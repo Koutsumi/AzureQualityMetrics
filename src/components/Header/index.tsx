@@ -1,57 +1,81 @@
-import { useState } from "react";
-import { useToast } from "@/shared/contexts/toast.context";
 import Header from "./component";
-import {
-  getProjects,
-  getSprints,
-} from "@/modules/dashboard/actions/selects.actions";
+import { useProjectData } from "@/shared/hooks/useProjectData";
+import { useSprintData } from "@/shared/hooks/useSprintData";
+import NavPills from "../NavPills.tsx";
+import { GeneralViewArea } from "@/modules/dashboard/components/generalViewArea";
 import { ISelectDataDTO } from "@/modules/dashboard/interfaces/select.interfaces";
 
 export const HeaderComponent: React.FC = () => {
-  const { toast } = useToast();
-  const [selectedProjects, setSelectedProjects] = useState<ISelectDataDTO[]>(
-    []
-  );
-  const [selectProject, setSelectProject] = useState<string>("");
-  const [selectedSprints, setSelectedSprints] = useState<ISelectDataDTO[]>([]);
-  const [selecteSprint, setSelectSprint] = useState<ISelectDataDTO>();
+  const {
+    selectedProjects,
+    selectProject,
+    onClickedSelectAreaProject,
+    setSelectProject,
+    getProjectByIdData,
+  } = useProjectData();
+  const {
+    selectedSprints,
+    getSprintsData,
+    onSprintChange,
+    getLastSprint,
+    selecteSprint,
+  } = useSprintData();
 
-  const getProjectsData = async () => {
-    const response = await getProjects();
-
-    if (response.error) {
-      return toast.error(response.error);
-    }
-
-    setSelectedProjects(response.data || []);
-  };
-
-  const onProjectChange = (value: string) => {
+  const onProjectChange = async (value: string) => {
     setSelectProject(value);
+
+    await getProjectByIdData(value);
+
+    await getLastSprint(value);
   };
 
-  const getSprintsData = async (projectId: string) => {
-    const response = await getSprints(projectId);
-
-    if (response.error) {
-      return toast.error(response.error);
-    }
-
-    setSelectedSprints(response.data || []);
-  };
-
-  const onSprintChange = (value: ISelectDataDTO) => {
-    setSelectSprint(value);
-  };
+  const tabs = [
+    {
+      key: "overview",
+      label: "Visão Geral",
+      content: <GeneralViewArea />,
+      onClick: () => console.log("ok"),
+    },
+    {
+      key: "project",
+      label: "Projeto",
+      content: <div>{/* Add TestResultsChart */}</div>,
+      disabled: !selectProject,
+    },
+    {
+      key: "tests",
+      label: "Testes",
+      content: <div>{/* Add TestResultsChart */}</div>,
+      disabled: !selectProject,
+    },
+    {
+      key: "bugs",
+      label: "Bugs",
+      content: <div>{/* Add BugTrendsChart and BugDetailsTable */}</div>,
+      disabled: !selectProject,
+    },
+    {
+      key: "inconsistencies",
+      label: "Inconsistências",
+      content: <div>{/* Add inconsistencies chart */}</div>,
+      disabled: !selectProject,
+    },
+  ];
 
   return (
-    <Header
-      projects={selectedProjects}
-      sprints={selectedSprints}
-      onProjectChange={onProjectChange}
-      onSprintChange={onSprintChange}
-      onClickProjectSelect={getProjectsData}
-      onClickSprintSelect={() => getSprintsData(selectProject)}
-    />
+    <header>
+      <Header
+        projects={selectedProjects}
+        sprints={selectedSprints}
+        onProjectChange={onProjectChange}
+        onSprintChange={onSprintChange}
+        onClickProjectSelect={onClickedSelectAreaProject}
+        onClickSprintSelect={() => getSprintsData(selectProject)}
+        sprintValue={selecteSprint?.name as ISelectDataDTO | undefined}
+      />
+      <section className="px-6 py-4">
+        <NavPills tabs={tabs} />
+      </section>
+    </header>
   );
 };
